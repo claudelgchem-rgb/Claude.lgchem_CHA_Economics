@@ -1,0 +1,17 @@
+# Streamlit theme — premium / editorial restraint
+# (presentation only; no logic. See docs/DESIGN_PRINCIPLES.md)
+[theme]
+base = "light"
+
+# 단일 액센트 1개 — 차분한 딥 잉크-틸. 네온/고채도 금지.
+primaryColor = "#14564D"
+
+# 웜 오프화이트 베이스(순백 아님) + 가라앉은 표면 톤
+backgroundColor = "#FBFAF7"
+secondaryBackgroundColor = "#F2F1EC"
+
+# 순흑 아닌 잉크 텍스트 (대비 확보)
+textColor = "#1B1C1E"
+
+# 본문은 가독성 우선 산세리프. 숫자 모노는 CSS에서 tabular-nums 처리.
+font = "sans serif"
