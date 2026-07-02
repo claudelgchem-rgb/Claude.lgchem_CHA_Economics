@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경제성 분석 · 디자인 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#0F766E; --accent-ink:#0B5F58; --accent-wash:#E9F3F1;
+    --canvas:#EEF1F4; --sheet:#FFFFFF; --panel:#F7F9FB;
+    --ink:#16202B; --ink-soft:#5A6570; --ink-faint:#8A94A0;
+    --line:#E4E8ED; --line-strong:#D3D9E0;
+    --pos:#0F766E; --neg:#B23B3B;
+    --shadow:0 1px 2px rgba(16,32,43,.04), 0 12px 34px rgba(16,32,43,.07);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--canvas);color:var(--ink);
+    font-family:Inter,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+    font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;}
+  .app{display:flex;min-height:100vh;}
+
+  /* ---------- Sidebar ---------- */
+  .side{width:236px;flex:none;background:#0E1720;color:#C7D0D9;
+    padding:22px 16px;display:flex;flex-direction:column;gap:6px;}
+  .brand{display:flex;align-items:center;gap:11px;padding:6px 8px 20px;}
+  .brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(160deg,#12897c,#0d5b52);
+    display:grid;place-items:center;}
+  .brand b{color:#fff;font-size:15px;font-weight:600;letter-spacing:-.01em;}
+  .brand span{display:block;color:#7d8894;font-size:11px;font-weight:500;}
+  .nav{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;
+    color:#AEB8C2;font-weight:500;cursor:default;}
+  .nav svg{width:17px;height:17px;stroke:currentColor;}
+  .nav.active{background:#1B2733;color:#fff;}
+  .nav.active svg{stroke:#3ec3b1;}
+  .nav .step{margin-left:auto;font-size:11px;color:#5c6773;}
+  .side .foot{margin-top:auto;padding:12px 10px 2px;border-top:1px solid #1c2833;
+    color:#7d8894;font-size:11px;}
+
+  /* ---------- Main ---------- */
+  .main{flex:1;min-width:0;padding:22px 30px 60px;}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+  .topbar h1{font-family:Newsreader,serif;font-weight:600;font-size:25px;letter-spacing:-.01em;margin:0;}
+  .topbar .sub{color:var(--ink-soft);font-size:13px;margin-top:1px;}
+  .topbar .spacer{flex:1;}
+  .btn{border:1px solid var(--line-strong);background:#fff;color:var(--ink);
+    padding:8px 14px;border-radius:9px;font-weight:600;font-size:13px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;}
+  .btn svg{width:15px;height:15px;stroke:currentColor;}
+  .btn:hover{border-color:var(--accent);color:var(--accent-ink);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn.primary:hover{background:var(--accent-ink);}
+
+  .sheet{background:var(--sheet);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:24px 26px;margin-bottom:22px;}
+  .sheet-h{display:flex;align-items:center;gap:10px;margin:0 0 18px;}
+  .sheet-h .bar{width:4px;height:19px;border-radius:3px;background:var(--accent);}
+  .sheet-h h2{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0;}
+  .sheet-h .tag{margin-left:auto;font-size:11px;font-weight:600;color:var(--accent-ink);
+    background:var(--accent-wash);padding:3px 10px;border-radius:20px;}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;}
+  .kpi{background:var(--sheet);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:18px 18px 16px;position:relative;overflow:hidden;}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
+  .kpi .lab{color:var(--ink-soft);font-size:12px;font-weight:600;display:flex;align-items:center;gap:7px;}
+  .kpi .lab svg{width:15px;height:15px;stroke:var(--accent);}
+  .kpi .val{font-size:26px;font-weight:700;letter-spacing:-.02em;margin-top:9px;}
+  .kpi .val small{font-size:13px;font-weight:600;color:var(--ink-faint);margin-left:3px;}
+  .kpi .delta{margin-top:6px;font-size:12px;font-weight:600;color:var(--ink-soft);}
+  .kpi .delta.pos{color:var(--pos);} .kpi .delta.neg{color:var(--neg);}
+
+  /* form row */
+  .frow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
+  .field .inp{border:1px solid var(--line-strong);border-radius:9px;padding:9px 12px;background:#fff;
+    display:flex;align-items:center;justify-content:space-between;color:var(--ink);font-weight:500;}
+  .field .inp.num{justify-content:flex-end;}
+  .field .inp .u{color:var(--ink-faint);font-size:12px;font-weight:600;margin-left:8px;}
+  .field .inp svg{width:15px;height:15px;stroke:var(--ink-faint);}
+
+  /* Flow diagram */
+  .flowwrap{display:flex;gap:22px;}
+  .flow{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:26px 22px;display:flex;align-items:center;gap:0;overflow-x:auto;}
+  .unit{flex:none;width:104px;text-align:center;}
+  .unit .ic{width:66px;height:66px;margin:0 auto;border-radius:16px;background:#fff;
+    border:1px solid var(--line);box-shadow:0 1px 2px rgba(16,32,43,.05);
+    display:grid;place-items:center;transition:.15s;}
+  .unit.sel .ic{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash);}
+  .unit .ic svg{width:34px;height:34px;stroke:var(--accent-ink);fill:none;stroke-width:1.6;}
+  .unit .nm{margin-top:9px;font-size:12px;font-weight:600;}
+  .unit .sub{font-size:10.5px;color:var(--ink-faint);}
+  .arrow{flex:none;width:34px;display:grid;place-items:center;color:var(--line-strong);}
+  .arrow svg{width:26px;height:14px;stroke:var(--accent);opacity:.55;}
+  .editor{width:240px;flex:none;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:18px;}
+  .editor h3{margin:0 0 4px;font-size:13px;font-weight:700;}
+  .editor .muted{color:var(--ink-faint);font-size:11px;margin-bottom:14px;}
+  .editor label{font-size:11px;font-weight:600;color:var(--ink-soft);display:block;margin:12px 0 5px;}
+  .editor .inp{border:1px solid var(--line-strong);border-radius:8px;padding:7px 10px;background:#fff;font-size:12px;}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{background:var(--accent-wash);color:var(--accent-ink);font-weight:650;text-align:right;
+    padding:10px 14px;border-bottom:2px solid var(--accent);font-size:12px;white-space:nowrap;}
+  thead th:first-child{text-align:left;border-top-left-radius:10px;}
+  thead th:last-child{border-top-right-radius:10px;}
+  tbody td{padding:9px 14px;border-bottom:1px solid var(--line);text-align:right;}
+  tbody td:first-child{text-align:left;color:var(--ink);}
+  tbody tr:hover td{background:#F5F8FA;}
+  .grp td{background:#F0F3F6;font-weight:700;color:var(--ink);}
+  .grp td:first-child{letter-spacing:-.01em;}
+  .sub-td{color:var(--ink-soft)!important;padding-left:28px!important;}
+  .bar{display:inline-block;height:7px;border-radius:4px;background:var(--accent);vertical-align:middle;}
+  .barcell{display:flex;align-items:center;gap:9px;justify-content:flex-end;}
+  .neg{color:var(--neg);}
+  tfoot td{padding:12px 14px;font-weight:700;border-top:2px solid var(--line-strong);text-align:right;font-size:14px;}
+  tfoot td:first-child{text-align:left;}
+
+  .note{font-size:12px;color:var(--ink-faint);margin-top:10px;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--ink-soft);}
+  .legend b{color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="side">
+    <div class="brand">
+      <div class="logo"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M4 20h16M7 20V9m5 11V5m5 15v-8"/></svg></div>
+      <div><b>TEA Platform</b><span>공정 경제성 분석</span></div>
+    </div>
+    <div class="nav active"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M4 7h16M4 12h16M4 17h10"/></svg>물질 등록<span class="step">1</span></div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M6 3v6l-3 8a2 2 0 002 3h14a2 2 0 002-3l-3-8V3"/><path d="M6 9h12"/></svg>용액 등록<span class="step">2</span></div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><rect x="3" y="5" width="6" height="5" rx="1"/><rect x="15" y="14" width="6" height="5" rx="1"/><path d="M9 7h4a3 3 0 013 3v4"/></svg>공정 흐름도<span class="step">3</span></div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M4 19V5m4 14V9m4 10V3m4 16v-6m4 6V7"/></svg>경제성 결과<span class="step">4</span></div>
+    <div class="foot">Base year · CE 806.7<br>Lang factor 3.14</div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Collagen 생산 경제성 분석</h1>
+        <div class="sub">Glucose 기반 발효 · 목표 100 MT/year</div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg>불러오기</button>
+      <button class="btn primary"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M5 12l5 5L20 7"/></svg>저장</button>
+    </div>
+
+    <!-- KPI row -->
+    <div class="kpis">
+      <div class="kpi">
+        <div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 3v18M7 8h7a3 3 0 010 6H8a3 3 0 000 6h8"/></svg>제조 원가</div>
+        <div class="val num">8,420<small>₩/kg</small></div>
+        <div class="delta neg">기준 대비 +3.1%</div>
+      </div>
+      <div class="kpi">
+        <div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>총 투자비 (Capex)</div>
+        <div class="val num">142.6<small>억원</small></div>
+        <div class="delta">GMP 적용 ×5</div>
+      </div>
+      <div class="kpi">
+        <div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg>생산 규모</div>
+        <div class="val num">100<small>MT/yr</small></div>
+        <div class="delta">가동 7,920 h</div>
+      </div>
+      <div class="kpi">
+        <div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>원료 단가 (Glucose)</div>
+        <div class="val num">620<small>₩/kg</small></div>
+        <div class="delta pos">시장가 −1.4%</div>
+      </div>
+    </div>
+
+    <!-- 물질/조건 등록 -->
+    <section class="sheet">
+      <div class="sheet-h"><div class="bar"></div><h2>물질 · 생산 조건</h2><div class="tag">Step 1</div></div>
+      <div class="frow">
+        <div class="field"><label>Target product</label><div class="inp">Collagen <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M6 9l6 6 6-6"/></svg></div></div>
+        <div class="field"><label>탄소원 (Carbon source)</label><div class="inp">Glucose <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M6 9l6 6 6-6"/></svg></div></div>
+        <div class="field"><label>목표 생산량</label><div class="inp num">100 <span class="u">MT/year</span></div></div>
+      </div>
+    </section>
+
+    <!-- 공정 흐름도 -->
+    <section class="sheet">
+      <div class="sheet-h"><div class="bar"></div><h2>공정 흐름도</h2><div class="tag">Step 3 · 유닛 아이콘 시연</div></div>
+      <div class="flowwrap">
+        <div class="flow">
+          <div class="unit">
+            <div class="ic"><!-- media/배지 탱크 -->
+              <svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16" rx="3"/><path d="M6 9h12" stroke-width="1.3"/><path d="M9 13c1 1 2 1 3 0s2-1 3 0" stroke-width="1.3"/></svg></div>
+            <div class="nm">배지 제조</div><div class="sub">Media Tank</div>
+          </div>
+          <div class="arrow"><svg viewBox="0 0 26 14"><path d="M0 7h22M17 2l6 5-6 5"/></svg></div>
+          <div class="unit">
+            <div class="ic"><!-- 멸균/autoclave -->
+              <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M9 6V4h6v2" stroke-width="1.3"/></svg></div>
+            <div class="nm">멸균</div><div class="sub">Autoclave</div>
+          </div>
+          <div class="arrow"><svg viewBox="0 0 26 14"><path d="M0 7h22M17 2l6 5-6 5"/></svg></div>
+          <div class="unit sel">
+            <div class="ic"><!-- 발효조 fermenter -->
+              <svg viewBox="0 0 24 24"><path d="M8 3h8M9 3v4l-3 4v8a2 2 0 002 2h8a2 2 0 002-2v-8l-3-4V3"/><circle cx="11" cy="15" r="1" stroke-width="1.2"/><circle cx="14" cy="17" r="1" stroke-width="1.2"/><circle cx="13" cy="13" r="1" stroke-width="1.2"/></svg></div>
+            <div class="nm">발효조</div><div class="sub">Fermenter</div>
+          </div>
+          <div class="arrow"><svg viewBox="0 0 26 14"><path d="M0 7h22M17 2l6 5-6 5"/></svg></div>
+          <div class="unit">
+            <div class="ic"><!-- 원심분리 centrifuge -->
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 016.9 4M12 12l5-2" stroke-width="1.4"/><circle cx="12" cy="12" r="1.5"/></svg></div>
+            <div class="nm">원심분리</div><div class="sub">Centrifuge</div>
+          </div>
+          <div class="arrow"><svg viewBox="0 0 26 14"><path d="M0 7h22M17 2l6 5-6 5"/></svg></div>
+          <div class="unit">
+            <div class="ic"><!-- 여과 filter -->
+              <svg viewBox="0 0 24 24"><path d="M4 5h16l-6 7v6l-4 2v-8L4 5z"/></svg></div>
+            <div class="nm">여과</div><div class="sub">Filtration</div>
+          </div>
+          <div class="arrow"><svg viewBox="0 0 26 14"><path d="M0 7h22M17 2l6 5-6 5"/></svg></div>
+          <div class="unit">
+            <div class="ic"><!-- 건조 dryer -->
+              <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M9 9c-1 1-1 2 0 3s1 2 0 3M15 9c-1 1-1 2 0 3s1 2 0 3" stroke-width="1.3"/></svg></div>
+            <div class="nm">건조</div><div class="sub">Dryer</div>
+          </div>
+        </div>
+        <div class="editor">
+          <h3>발효조 · Fermenter</h3>
+          <div class="muted">선택된 유닛 편집</div>
+          <label>Working volume</label><div class="inp num">50,000 L</div>
+          <label>Batch time</label><div class="inp num">72 h</div>
+          <label>Titer</label><div class="inp num">45 g/L</div>
+          <button class="btn primary" style="width:100%;margin-top:16px;justify-content:center;">변경 사항 저장</button>
+        </div>
+      </div>
+      <div class="legend">
+        <span><b>실제 유닛 의미</b>를 담은 아이콘 예시입니다.</span>
+        <span>배지·멸균·발효·원심분리·여과·건조 → 각기 다른 픽토그램</span>
+      </div>
+    </section>
+
+    <!-- 경제성 결과 -->
+    <section class="sheet">
+      <div class="sheet-h"><div class="bar"></div><h2>제조원가 상세 (Cost Breakdown)</h2><div class="tag">Step 4 · ₩ / kg</div></div>
+      <table class="num">
+        <thead><tr>
+          <th>항목</th><th>원단위<br>[kg/kg]</th><th>단가<br>[₩/kg]</th><th>제조원가<br>[₩/kg]</th><th>비중</th>
+        </tr></thead>
+        <tbody>
+          <tr class="grp"><td>변동비</td><td></td><td></td><td>5,930</td><td>70.4%</td></tr>
+          <tr><td class="sub-td">발효 원재료 · Glucose</td><td>1.82</td><td>620</td><td>1,128</td><td><span class="barcell"><span class="bar" style="width:52px"></span>13.4%</span></td></tr>
+          <tr><td class="sub-td">발효 부재료 · Yeast extract</td><td>0.34</td><td>2,450</td><td>833</td><td><span class="barcell"><span class="bar" style="width:38px"></span>9.9%</span></td></tr>
+          <tr><td class="sub-td">유틸리티 · 전기</td><td>2.10</td><td>171</td><td>359</td><td><span class="barcell"><span class="bar" style="width:16px"></span>4.3%</span></td></tr>
+          <tr><td class="sub-td">유틸리티 · 스팀</td><td>3.40</td><td>42</td><td>143</td><td><span class="barcell"><span class="bar" style="width:7px"></span>1.7%</span></td></tr>
+          <tr class="grp"><td>고정비</td><td></td><td></td><td>2,490</td><td>29.6%</td></tr>
+          <tr><td class="sub-td">감가비</td><td>—</td><td>—</td><td>1,166</td><td><span class="barcell"><span class="bar" style="width:54px"></span>13.8%</span></td></tr>
+          <tr><td class="sub-td">인건비</td><td>—</td><td>—</td><td>960</td><td><span class="barcell"><span class="bar" style="width:44px"></span>11.4%</span></td></tr>
+          <tr><td class="sub-td">수선비</td><td>—</td><td>—</td><td>364</td><td><span class="barcell"><span class="bar" style="width:17px"></span>4.3%</span></td></tr>
+        </tbody>
+        <tfoot><tr><td>제조 원가 합계</td><td></td><td></td><td>8,420</td><td>100%</td></tr></tfoot>
+      </table>
+      <div class="note">※ 숫자는 tabular figures로 자릿수 정렬 · 우측 정렬 · 비중은 헤어라인 막대로 표현 (예시 데이터)</div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
