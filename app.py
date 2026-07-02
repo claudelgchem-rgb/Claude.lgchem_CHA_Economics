@@ -25,47 +25,104 @@ def timer(label):
 
 
 st.set_page_config(layout="wide")
-# --- Presentation theme (premium / editorial restraint) ---------------------
+# --- Presentation theme (bold premium dashboard) ----------------------------
 # 프레젠테이션 전용 CSS. 로직/상태/계산과 무관. 기준: docs/DESIGN_PRINCIPLES.md
+# 색을 바꾸려면 아래 :root 변수 4개 + .streamlit/config.toml 만 고치면 됩니다.
 st.markdown("""
 <style>
-  /* 본문 측정선: 과한 풀스크린 여백 대신 의도된 컨텐츠 폭 */
-  .block-container { padding-top: 2.75rem; padding-bottom: 4rem; max-width: 1320px; }
+  :root {
+    --accent:      #0F766E;   /* 딥 틸 액센트 */
+    --accent-ink:  #0B5F58;   /* hover/press */
+    --canvas:      #ECEFF3;   /* 그레이 캔버스 */
+    --ink:         #16202B;   /* 본문 잉크 */
+    --ink-soft:    #55606B;   /* 보조 텍스트 */
+    --line:        #E3E7EC;   /* 헤어라인 */
+    --line-strong: #D3D8DE;
+  }
 
-  /* 타이포 위계 — 크기뿐 아니라 자간/굵기로 위계를 만든다 */
-  h1, h2, h3 { letter-spacing: -0.012em; font-weight: 650; color: #1B1C1E; }
-  h1 { font-size: 1.6rem; }
-  h2 { font-size: 1.22rem; margin-top: 0.5rem; }
-  h3 { font-size: 1.02rem; color: #3A3D42; }
+  /* 캔버스 = 쿨 그레이. 기본 상단 헤더바는 투명 처리 */
+  .stApp { background: var(--canvas); }
+  [data-testid="stHeader"] { background: transparent; }
 
-  /* 숫자는 tabular lining figures — 자릿수 정렬(경제성 데이터의 핵심) */
+  /* 본문 전체를 '떠 있는 화이트 시트'로 — 대시보드 톤의 핵심 */
+  .block-container {
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 1px 2px rgba(16,32,43,.04), 0 10px 34px rgba(16,32,43,.06);
+      padding: 2.4rem 2.6rem 3rem;
+      margin-top: 1.4rem;
+      max-width: 1380px;
+  }
+
+  /* 타이포 위계 — 크기뿐 아니라 자간/굵기/색으로 위계를 만든다 */
+  h1, h2, h3 { letter-spacing: -0.015em; color: var(--ink); font-weight: 700; }
+  h1 { font-size: 1.7rem; }
+  /* 섹션 헤딩엔 액센트 좌측 바(editorial kicker) */
+  h2 { font-size: 1.3rem; margin-top: .4rem;
+       border-left: 4px solid var(--accent); padding-left: .65rem; line-height: 1.25; }
+  h3 { font-size: 1.05rem; color: var(--ink-soft); font-weight: 650; }
+
+  /* 숫자는 tabular lining figures — 자릿수 정렬(경제성 데이터 핵심) */
   .dataframe table { font-family: Consolas, "Courier New", monospace; }
   [data-testid="stTable"], [data-testid="stDataFrame"], .dataframe {
       font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
 
-  /* 표 — 헤어라인 행 구분 + 넉넉한 셀 패딩 (zebra/형광 배경 지양) */
+  /* 표 — 헤어라인 행 구분 + 액센트 헤더 바 + 숫자 우측 정렬 */
   .dataframe table { border-collapse: collapse; width: 100%; }
   .dataframe th, .dataframe td {
-      border: none; border-bottom: 1px solid #E7E5DF;
-      padding: 0.42rem 0.85rem; }
+      border: none; border-bottom: 1px solid var(--line); padding: .5rem .9rem; }
   .dataframe thead th {
-      border-bottom: 1.5px solid #D6D3CB;
-      font-weight: 600; color: #54575C; background: transparent; }
-  .dataframe td:not(:first-child) { text-align: right; }   /* 숫자 우측 정렬 */
+      background: #EAF3F1; color: var(--accent-ink);
+      border-bottom: 2px solid var(--accent);
+      font-weight: 650; text-transform: none; }
+  .dataframe td:not(:first-child) { text-align: right; }
 
-  /* 엘리베이션은 조용하게 — 무거운 섀도 대신 헤어라인 보더 */
-  [data-testid="stExpander"] details,
+  /* 카드 — 흰 시트 위 살짝 눌린 톤의 패널(그레이) + 조용한 엘리베이션 */
   [data-testid="stVerticalBlockBorderWrapper"] {
-      border-color: #E4E2DB !important; box-shadow: none !important; }
+      background: #F7F9FB; border: 1px solid var(--line) !important;
+      border-radius: 14px; box-shadow: none !important; }
 
-  /* 버튼 — pill 일색/그라데이션 금지. 절제된 모서리 + 조용한 상태 */
+  /* Expander = 카드형 */
+  [data-testid="stExpander"] details {
+      border: 1px solid var(--line) !important; border-radius: 12px;
+      background: #F7F9FB; box-shadow: none !important; overflow: hidden; }
+  [data-testid="stExpander"] summary { font-weight: 600; color: var(--ink); }
+
+  /* 버튼 — primary는 액센트 채움, secondary는 아웃라인. pill/그라데이션 금지 */
   .stButton > button {
-      border-radius: 7px; border: 1px solid #D6D3CB; font-weight: 550;
-      transition: background-color 120ms ease, border-color 120ms ease; }
-  .stButton > button:hover { border-color: #14564D; }
+      border-radius: 9px; font-weight: 600; padding: .5rem 1rem;
+      transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease; }
+  .stButton > button[kind="primary"],
+  .stButton > button[data-testid="baseButton-primary"] {
+      background: var(--accent); border: 1px solid var(--accent); color: #fff; }
+  .stButton > button[kind="primary"]:hover,
+  .stButton > button[data-testid="baseButton-primary"]:hover {
+      background: var(--accent-ink); border-color: var(--accent-ink); }
+  .stButton > button[kind="secondary"],
+  .stButton > button[data-testid="baseButton-secondary"] {
+      background: #fff; border: 1px solid var(--line-strong); color: var(--ink); }
+  .stButton > button[kind="secondary"]:hover { border-color: var(--accent); color: var(--accent-ink); }
+  [data-testid="stFormSubmitButton"] > button {
+      background: var(--accent); border: 1px solid var(--accent); color:#fff; border-radius: 9px; font-weight: 600; }
+  [data-testid="stFormSubmitButton"] > button:hover { background: var(--accent-ink); }
 
-  /* 구분선은 헤어라인으로 가늘게 */
-  hr { border-color: #E7E5DF; }
+  /* 입력창(text/number/select) — 정돈된 보더 + 액센트 포커스 링 */
+  [data-baseweb="input"], [data-baseweb="select"] > div,
+  [data-testid="stNumberInput"] div[data-baseweb="input"] {
+      border-radius: 9px !important; border-color: var(--line-strong) !important; }
+  [data-baseweb="input"]:focus-within, [data-baseweb="select"] > div:focus-within {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px rgba(15,118,110,.15) !important; }
+
+  /* 라벨 위계 정리 */
+  [data-testid="stWidgetLabel"] label p { color: var(--ink-soft); font-weight: 600; font-size: .84rem; }
+
+  /* 구분선 — 가는 헤어라인 */
+  hr, [data-testid="stDivider"] { border-color: var(--line); }
+
+  /* 코드/모노 배경 등 잔가지 정리 */
+  [data-testid="stMetricValue"] { font-variant-numeric: tabular-nums; }
 </style>
 """, unsafe_allow_html=True)
 

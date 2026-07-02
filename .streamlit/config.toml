@@ -1,17 +1,18 @@
-# Streamlit theme — premium / editorial restraint
-# (presentation only; no logic. See docs/DESIGN_PRINCIPLES.md)
+# Streamlit theme — bold premium dashboard (presentation only; no logic)
+# 색 톤을 바꾸려면 아래 4개 색만 교체하면 됩니다. 기준: docs/DESIGN_PRINCIPLES.md
 [theme]
 base = "light"
 
-# 단일 액센트 1개 — 차분한 딥 잉크-틸. 네온/고채도 금지.
-primaryColor = "#14564D"
+# 단일 액센트 — 딥 틸(신뢰감 있는 산업/금융 톤). 네온/그라데이션 금지.
+primaryColor = "#0F766E"
 
-# 웜 오프화이트 베이스(순백 아님) + 가라앉은 표면 톤
-backgroundColor = "#FBFAF7"
-secondaryBackgroundColor = "#F2F1EC"
+# 쿨 그레이 캔버스 (그 위에 흰 시트가 '떠 보이게' 만드는 핵심)
+backgroundColor = "#ECEFF3"
 
-# 순흑 아닌 잉크 텍스트 (대비 확보)
-textColor = "#1B1C1E"
+# 카드/입력/사이드바 = 화이트
+secondaryBackgroundColor = "#FFFFFF"
 
-# 본문은 가독성 우선 산세리프. 숫자 모노는 CSS에서 tabular-nums 처리.
+# 딥 슬레이트 잉크 텍스트(순흑 아님)
+textColor = "#16202B"
+
 font = "sans serif"
